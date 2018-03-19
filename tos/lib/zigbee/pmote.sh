@@ -4,7 +4,7 @@
 
 PLATFORM=telosb
 
-APP_TEST_PATH=$TINYOS_OS_DIR/lib/zigbee/tests
+APP_TEST_PATH=tests
 echo $APP_TEST_PATH
 
 PROG_DEV=bsl

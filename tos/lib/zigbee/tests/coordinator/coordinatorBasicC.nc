@@ -6,16 +6,8 @@
 #include <Timer.h>
 #include "printfUART.h"
 #include "log_enable.h"
-
-#ifdef APP_PRINTFS_ENABLED
-	#define lclPrintf				printfUART
-	#define lclprintfUART_init		printfUART_init
-#else
-	#define lclPrintf(__format, __args...)
-	void lclprintfUART_init() {}
-#endif
-
-
+#include <stdio.h>
+#include <stdint.h>
 
 module coordinatorBasicC 
 {
@@ -47,7 +39,6 @@ implementation
 	// Depth by configuration
 	uint8_t networkStarted;
 	// This function initializes the variables.
-
 	void initVariables()
 	{
 		// Depth by configuration (initialize to default)
@@ -180,7 +171,7 @@ implementation
 			break;
 		}
 		
-		lclPrintf("Coordinator: Sending negotiation reply\n", "");
+		printf("Coordinator: Sending negotiation reply\r\n", "");
 		call NLDE_DATA.request(source_address, 0x06, nsdu_pay, 0, 1, 0x00, 0);
 	}
 
@@ -193,20 +184,37 @@ implementation
 
 	event error_t NLDE_DATA.confirm(uint8_t NsduHandle, uint8_t Status)
 	{
-		lclPrintf("NLDE_DATA.confirm\n", "");
+		printf("NLDE_DATA.confirm\r\n", "");
 		return SUCCESS;
 	}
 
-	event error_t NLDE_DATA.indication(uint16_t SrcAddress, uint8_t NsduLength,
-					uint8_t Nsdu[120], 
-					uint16_t LinkQuality)
+	event error_t NLDE_DATA.indication(uint16_t SrcAddress, uint8_t NsduLength, uint8_t Nsdu[120], uint16_t LinkQuality)
 	{
+		//printf("*************");
+		/*
+				printf("SrcAddress %d\r\n", SrcAddress);
+				printf("NsduLength %d\r\n", NsduLength);
+				printf("LinkQuality %d\r\n", LinkQuality);
+				for(i=0; i < NsduLength; i++){
+					printf("Nsdu i = %d val = %d\r\n", i, Nsdu[i]);
+				}*/
+		//printf("*************");
+
+
 		uint8_t packetCode = Nsdu[0];
+		int i;
 		// TDBS mechanism
 		beacon_scheduling *beacon_scheduling_ptr;
+		printf("packetCode %d\r\n", packetCode);
 
-		lclPrintf("NLDE_DATA.indication\n", "");
-		
+		printf("NLDE_DATA.indication\r\n", "");
+		printf("*************");
+		printf("SrcAddress %d\r\n", SrcAddress);
+		printf("NsduLength %d\r\n", NsduLength);
+		printf("LinkQuality %d\r\n", LinkQuality);
+		for(i=0; i < NsduLength; i++){
+			printf("Nsdu i = %d val = %d\r\n", i, Nsdu[i]);
+		}
 		// The packet is for me (check has been done into MCPS_DATA.indication)
 
 		// TDBS mechanism
@@ -234,7 +242,7 @@ implementation
 
 	event error_t NLME_NETWORK_FORMATION.confirm(uint8_t Status)
 	{	
-		lclPrintf("NLME_NETWORK_FORMATION.confirm\n", ""); 
+		printf("NLME_NETWORK_FORMATION.confirm\r\n", ""); 
 
 		networkStarted = 1;
 		
@@ -245,7 +253,7 @@ implementation
 	/*************************NLME_JOIN*****************************/
 	event error_t NLME_JOIN.indication(uint16_t ShortAddress, uint32_t ExtendedAddress[], uint8_t CapabilityInformation, bool SecureJoin)
 	{
-		lclPrintf("NLME_JOIN.indication\n", "");
+		printf("NLME_JOIN.indication\r\n", "");
 		return SUCCESS;
 	}
 
@@ -257,20 +265,20 @@ implementation
 	/*************************NLME_LEAVE****************************/
 	event error_t NLME_LEAVE.indication(uint64_t DeviceAddress)
 	{
-		lclPrintf("NLME_LEAVE.indication\n", "");
+		printf("NLME_LEAVE.indication\r\n", "");
 		return SUCCESS;
 	}
 
 	event error_t NLME_LEAVE.confirm(uint64_t DeviceAddress, uint8_t Status)
 	{
-		lclPrintf("NLME_LEAVE.confirm\n", "");
+		printf("NLME_LEAVE.confirm\r\n", "");
 		return SUCCESS;
 	}
 
 	/*************************NLME_SYNC*****************************/
 	event error_t NLME_SYNC.indication()
 	{
-		lclPrintf("NLME_SYNC.indication\n", "");
+		printf("NLME_SYNC.indication\r\n", "");
 
 		// We lost connection with our parent. Automatic rescan is done
 		// by the NWK
@@ -297,7 +305,7 @@ implementation
 
 	event error_t NLME_RESET.confirm(uint8_t status)
 	{
-		lclPrintf("NLME_RESET.confirm\n", "");
+		printf("NLME_RESET.confirm\r\n", "");
 
 		call T_init.startOneShot(5000);
 		return SUCCESS;
@@ -307,7 +315,7 @@ implementation
 	/*******************T_init**************************/
 	event void T_init.fired() 
 	{
-		lclPrintf("I'm THE coordinator\n", "");
+		printf("I'm THE coordinator\r\n", "");
 		call NLME_NETWORK_FORMATION.request(LOGICAL_CHANNEL, 8, BEACON_ORDER, SUPERFRAME_ORDER, MAC_PANID, 0);
 		return;
 	}
@@ -317,7 +325,7 @@ implementation
 	{
 		if (state == BUTTON_PRESSED && networkStarted == 0) 
 		{
-			lclPrintf("Button pressed\n", "");
+			printf("Button pressed\r\n", "");
 			call NLME_RESET.request();
 		}
 	}

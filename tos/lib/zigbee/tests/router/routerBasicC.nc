@@ -7,14 +7,8 @@
 #include <Timer.h>
 #include "printfUART.h"
 #include "log_enable.h"
-
-#ifdef APP_PRINTFS_ENABLED
-	#define lclPrintf				printfUART
-	#define lclprintfUART_init		printfUART_init
-#else
-	#define lclPrintf(__format, __args...)
-	void lclprintfUART_init() {}
-#endif
+#include <stdio.h>
+#include <stdint.h>
 
 module routerBasicC 
 {
@@ -43,10 +37,12 @@ module routerBasicC
 		interface Get<button_state_t>;
 		interface Notify<button_state_t>;
 	#endif
+	
 	}   
 }
 implementation
 {
+
 	// Depth by configuration
 	uint8_t myDepth;
 	//boolean variable definig if the device has joined to the PAN
@@ -73,7 +69,6 @@ implementation
 
 	event void Boot.booted() 
 	{
-		lclprintfUART_init();//make the possibility to print
 		initVariables();
 		call NLME_RESET.request();
 	}
@@ -93,7 +88,8 @@ implementation
 		
 		requested_scheduling = 0x01;
 		
-		lclPrintf("Router: Sending negotiation request\n", "");
+		//lclPrintf("Router: Sending negotiation request\r\n", "");
+		printf("Router: Sending negotiation request\r\n", "");
 		call NLDE_DATA.request(0x0000, 0x06, nsdu_pay, 0, 1, 0x00, 0);
 		
 		call T_schedule.startOneShot(20000);   
@@ -108,24 +104,30 @@ implementation
 
 	event error_t NLDE_DATA.confirm(uint8_t NsduHandle, uint8_t Status)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLDE_DATA.confirm\n", "");
-	#endif
+		printf("NLDE_DATA.confirm\r\n", "");
+		printf("NsduHandle %d\r\n", NsduHandle);
+		printf("Status %d\r\n", Status);
+
 		call Leds.led1Toggle();
 		return SUCCESS;
 	}
 
-	event error_t NLDE_DATA.indication(uint16_t SrcAddress, uint8_t NsduLength,
-				uint8_t Nsdu[120], 
-				uint16_t LinkQuality)
+	event error_t NLDE_DATA.indication(uint16_t SrcAddress, uint8_t NsduLength, uint8_t Nsdu[120], uint16_t LinkQuality)
 	{
 		uint8_t packetCode = Nsdu[0];
+		int i;
 		// TDBS mechanism
 		beacon_scheduling *beacon_scheduling_ptr;
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLDE_DATA.indication\n", "");
-	#endif
-		
+	
+		printf("NLDE_DATA.indication\r\n", "");
+		printf("*************");
+		printf("SrcAddress %d\r\n", SrcAddress);
+		printf("NsduLength %d\r\n", NsduLength);
+		printf("LinkQuality %d\r\n", LinkQuality);
+		for(i=0; i < NsduLength; i++){
+			printf("Nsdu i = %d val = %d\r\n", i, Nsdu[i]);
+		}
+	
 		// The packet is for me (check has been done into MCPS_DATA.indication in NWKP.nc)
 		// TDBS mechanism  
 		if(requested_scheduling == 0x01)
@@ -148,7 +150,7 @@ implementation
 
 				start_time  = ( ((uint32_t)start_time1 << 16) | (start_time2 << 0) );
 
-				lclPrintf("start_time=0x%x\n", start_time);
+				printf("start_time=0x%x\r\n", start_time);
 
 				call NLME_START_ROUTER.request (
 						beacon_scheduling_ptr->beacon_order, 
@@ -169,35 +171,27 @@ implementation
 	// directly to the parent and issuing a JOIN confirm, instead
 	event error_t NLME_NETWORK_DISCOVERY.confirm(uint8_t NetworkCount,networkdescriptor networkdescriptorlist[], uint8_t Status)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_NETWORK_DISCOVERY.confirm\n", ""); 
-	#endif
+		printf("NLME_NETWORK_DISCOVERY.confirm\r\n", ""); 
 		return SUCCESS;
 	}
 
 	/*****************NLME_START_ROUTER*****************************/
 	event error_t NLME_START_ROUTER.confirm(uint8_t Status)
 	{ 
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_START_ROUTER.confirm\n", "");
-	#endif
+		printf("NLME_START_ROUTER.confirm\r\n", "");
 		return SUCCESS;
 	}
 
 	/*************************NLME_JOIN*****************************/
 	event error_t NLME_JOIN.indication(uint16_t ShortAddress, uint32_t ExtendedAddress[], uint8_t CapabilityInformation, bool SecureJoin)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_JOIN.indication\n", "");
-	#endif
+		printf("NLME_JOIN.indication\r\n", "");
 		return SUCCESS;
 	}
 
 	event error_t NLME_JOIN.confirm(uint16_t PANId, uint8_t Status, uint16_t parentAddress)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_JOIN.confirm\n", "");
-	#endif
+		printf("NLME_JOIN.confirm\r\n", "");
 		switch(Status)
 		{
 		case NWK_SUCCESS:
@@ -241,26 +235,21 @@ implementation
 	/*************************NLME_LEAVE****************************/
 	event error_t NLME_LEAVE.indication(uint64_t DeviceAddress)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_LEAVE.indication\n", "");
-	#endif
+		printf("NLME_LEAVE.indication\r\n", "");
 		return SUCCESS;
 	}
 
 	event error_t NLME_LEAVE.confirm(uint64_t DeviceAddress, uint8_t Status)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_LEAVE.confirm\n", "");
-	#endif
+		printf("NLME_LEAVE.confirm\r\n", "");
 		return SUCCESS;
 	}
 
 	/*************************NLME_SYNC*****************************/
 	event error_t NLME_SYNC.indication()
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_SYNC.indication\n", "");
-	#endif
+		printf("NLME_SYNC.indication\r\n", "");
+	
 		// We lost connection with our parent. Automatic rescan is done
 		// at the NWK layer
 
@@ -274,36 +263,27 @@ implementation
 
 	event error_t NLME_SYNC.confirm(uint8_t Status)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_SYNC.confirm\n", "");
-	#endif
+		printf("NLME_SYNC.confirm\r\n", "");
 		return SUCCESS;
 	}
 
 	/*****************        NLME-SET     ********************/
 	event error_t NLME_SET.confirm(uint8_t Status, uint8_t NIBAttribute)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_SET.confirm\n", "");
-	#endif
+		printf("NLME_SET.confirm\r\n", "");
 		return SUCCESS;
 	}
 
 	/*****************        NLME-GET     ********************/
 	event error_t NLME_GET.confirm(uint8_t Status, uint8_t NIBAttribute, uint16_t NIBAttributeLength, uint16_t NIBAttributeValue)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_GET.confirm\n", "");
-	#endif
+		printf("NLME_GET.confirm\r\n", "");
 		return SUCCESS;
 	}
 
 	event error_t NLME_RESET.confirm(uint8_t status)
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("NLME_RESET.confirm\n", "");
-	#endif
-
+		printf("NLME_RESET.confirm\r\n", "");
 		call T_init.startOneShot(5000);
 		return SUCCESS;
 	}
@@ -316,10 +296,7 @@ implementation
 	/*******************T_init**************************/
 	event void T_init.fired() 
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("I'm NOT the coordinator\n", "");
-	#endif
-
+		printf("I'm NOT the coordinator\r\n", "");
 		call NLME_NETWORK_DISCOVERY.request(LOGICAL_CHANNEL, BEACON_ORDER);
 		return;
 	}
@@ -328,10 +305,7 @@ implementation
 	/*******************NetAssociationDeferredTimer**************************/
 	event void NetAssociationDeferredTimer.fired()
 	{
-	#if (LOG_LEVEL & TRACE_FUNC)
-		lclPrintf("go join as router\n", ""); 
-	#endif
-
+		printf("go join as router\r\n", ""); 
 		call NLME_JOIN.request(MAC_PANID, TRUE, FALSE, 0, 0, 0, 0, 0);
 	}
 
@@ -347,19 +321,14 @@ implementation
 	}
 
 #if defined(PLATFORM_TELOSB)
-	event void Notify.notify(button_state_t state)
-	{
-		if (state == BUTTON_PRESSED) 
-		{
-		#if (LOG_LEVEL & TRACE_FUNC)
-			lclPrintf("Button pressed\n", "");
-		#endif
-
+	event void Notify.notify(button_state_t state){
+		if (state == BUTTON_PRESSED) {
+			printf("Button pressed\r\n", "");
 			call Leds.led0On();
 			call NLME_RESET.request();
 		}
 	}
 #endif
-  
+
 }
 

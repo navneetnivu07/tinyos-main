@@ -39,7 +39,7 @@ module TestP @safe() {
     int ctr = 0;
     while (++ctr) {
       volatile uint16_t idlectr = 0;
-      printf("Hello iteration %d\n", ctr);
+      printf("Hello iteration %d\r\n", ctr);
       /* "Portable" arbitrary delay, just to reduce the stream going
        * to the serial port. */
       while (++idlectr) {

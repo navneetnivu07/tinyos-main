@@ -18,6 +18,7 @@ implementation
 {
 	components MainC;
 	components LedsC;
+	components SerialPrintfC;
 
 	components routerBasicC as App;
 	App.Boot -> MainC;
@@ -49,5 +50,6 @@ implementation
 	App.NLME_SYNC -> NWKC.NLME_SYNC;
 	App.NLME_GET -> NWKC.NLME_GET;
 	App.NLME_SET -> NWKC.NLME_SET;
+
 }
 

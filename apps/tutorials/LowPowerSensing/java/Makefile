@@ -1,6 +1,6 @@
 GEN=SerialRequestSamplesMsg.java SerialSampleMsg.java Constants.java
 
-SENSOR_DIR = universal_sensors
+SENSOR_DIR = tmote_onboard_sensors
 SENSOR_DEPS = ../$(SENSOR_DIR)/SensorSample.h
 
 TFLAGS = -I../$(SENSOR_DIR) -I$(TINYOS_OS_DIR)/types -I$(TINYOS_OS_DIR)/platforms/null -I$(TINYOS_OS_DIR)/lib/serial

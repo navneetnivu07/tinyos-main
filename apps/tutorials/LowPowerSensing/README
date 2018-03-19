@@ -99,7 +99,7 @@ instance of serial forwarder to do so.
 cd java
 make 
 java net.tinyos.sf.SerialForwarder -comm serial@/dev/ttyUSB0:telosb &
-java LowePowerSensingApp
+java LowPowerSensingApp
 
 After starting the java application you will be presented with a user 
 prompt that looks like:

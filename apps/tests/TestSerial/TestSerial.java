@@ -44,10 +44,15 @@ import java.io.IOException;
 import net.tinyos.message.*;
 import net.tinyos.packet.*;
 import net.tinyos.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class TestSerial implements MessageListener {
 
   private MoteIF moteIF;
+
+
+  SimpleDateFormat sdf = new SimpleDateFormat("h:mm:ss a");
   
   public TestSerial(MoteIF moteIF) {
     this.moteIF = moteIF;
@@ -60,7 +65,9 @@ public class TestSerial implements MessageListener {
     
     try {
       while (true) {
-	System.out.println("Sending packet " + counter);
+          Calendar cal = Calendar.getInstance();
+
+	System.out.println("Sending packet " + counter + " Time : " + sdf.format(cal.getTime()));
 	payload.set_counter(counter);
 	moteIF.send(0, payload);
 	counter++;
@@ -76,7 +83,9 @@ public class TestSerial implements MessageListener {
 
   public void messageReceived(int to, Message message) {
     TestSerialMsg msg = (TestSerialMsg)message;
-    System.out.println("Received packet sequence number " + msg.get_counter());
+        Calendar cal2 = Calendar.getInstance();
+
+    System.out.println("Received packet sequence number " + msg.get_counter() + " Time : " + sdf.format(cal2.getTime()));
   }
   
   private static void usage() {

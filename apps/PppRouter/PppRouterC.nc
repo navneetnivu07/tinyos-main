@@ -54,7 +54,7 @@ configuration PppRouterC {
 #endif
 
   // UDP shell on port 2000
-  components UDPShellC;
+  //components UDPShellC;
 
   // prints the routing table
   // components RouteCmdC;

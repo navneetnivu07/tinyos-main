@@ -14,3 +14,10 @@
 ./pmote.sh i e 2 10 2 1 120 150
 ./pmote.sh i e 3 11 2 1 173 116
 
+
+#To Program Device Seperately
+#./pmote.sh i c 0 0
+#./pmote.sh i r 0 1 1 0
+#./pmote.sh i e 0 10 2 1 120 150
+#./pmote.sh i e 0 11 2 1 173 116
+
