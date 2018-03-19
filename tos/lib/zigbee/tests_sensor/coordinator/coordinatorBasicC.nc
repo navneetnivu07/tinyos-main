@@ -245,9 +245,7 @@ implementation
 	event error_t NLME_NETWORK_FORMATION.confirm(uint8_t Status)
 	{	
 		printf("NLME_NETWORK_FORMATION.confirm\r\n", ""); 
-
 		networkStarted = 1;
-		
 		// The Coordinator is transmitting its own beacons
 		return SUCCESS;
 	}
