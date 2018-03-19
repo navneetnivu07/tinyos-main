@@ -120,7 +120,6 @@ implementation
 		beacon_scheduling *beacon_scheduling_ptr;
 	
 		printf("NLDE_DATA.indication\r\n", "");
-		printf("*************");
 		printf("SrcAddress %d\r\n", SrcAddress);
 		printf("NsduLength %d\r\n", NsduLength);
 		printf("LinkQuality %d\r\n", LinkQuality);

@@ -63,13 +63,18 @@ implementation
 
 
 	//function used to schedule the beacon requests (PAN coordinator)
-	void process_beacon_scheduling(uint16_t source_address,uint8_t beacon_order, uint8_t superframe_order)
+	void process_beacon_scheduling(uint16_t source_address, uint8_t beacon_order, uint8_t superframe_order)
 	{
+		//Sample data for router
+			//source_address = 1, beacon_order = 8, superframe_order = 4 //from MACprofile.h
+
 		uint8_t nsdu_pay[6];
 		beacon_scheduling *beacon_scheduling_ptr = (beacon_scheduling *)(&nsdu_pay[0]);
 
 		beacon_scheduling_ptr->beacon_order = beacon_order;
 		beacon_scheduling_ptr->superframe_order = superframe_order;
+
+		//TDBS Reference Paper -> https://link.springer.com/article/10.1007%2Fs11241-008-9063-4
 
 		switch(source_address)
 		{
@@ -192,42 +197,28 @@ implementation
 
 	event error_t NLDE_DATA.indication(uint16_t SrcAddress, uint8_t NsduLength, uint8_t Nsdu[120], uint16_t LinkQuality)
 	{
-		//printf("*************");
-		/*
-				printf("SrcAddress %d\r\n", SrcAddress);
-				printf("NsduLength %d\r\n", NsduLength);
-				printf("LinkQuality %d\r\n", LinkQuality);
-				for(i=0; i < NsduLength; i++){
-					printf("Nsdu i = %d val = %d\r\n", i, Nsdu[i]);
-				}*/
-		//printf("*************");
-
-
 		uint8_t packetCode = Nsdu[0];
 		int i;
-		// TDBS mechanism
+		// TDBS (Time Division Beacon Scheduling) mechanism
 		beacon_scheduling *beacon_scheduling_ptr;
-		printf("packetCode %d\r\n", packetCode);
-
+				
 		printf("NLDE_DATA.indication\r\n", "");
-		printf("*************");
+		printf("packetCode %d\r\n", packetCode);
 		printf("SrcAddress %d\r\n", SrcAddress);
 		printf("NsduLength %d\r\n", NsduLength);
 		printf("LinkQuality %d\r\n", LinkQuality);
 		for(i=0; i < NsduLength; i++){
 			printf("Nsdu i = %d val = %d\r\n", i, Nsdu[i]);
 		}
-		// The packet is for me (check has been done into MCPS_DATA.indication)
+		
+		// The packet is for me (check has been done into MCPS_DATA.indication) /tos/lib/mac/tkn154/interfaces/MCPS/MCPS_DATA.nc
 
-		// TDBS mechanism
-		if (packetCode == SCHEDULING_REQUEST) 
-		{
+		// TDBS (Time Division Beacon Scheduling) mechanism
+		if (packetCode == SCHEDULING_REQUEST) {
 			beacon_scheduling_ptr = (beacon_scheduling *)Nsdu;
 
 			// PAN coordinator receiving a negotiation request
-			process_beacon_scheduling (SrcAddress, 
-				beacon_scheduling_ptr->beacon_order, 
-				beacon_scheduling_ptr->superframe_order);
+			process_beacon_scheduling (SrcAddress, beacon_scheduling_ptr->beacon_order, beacon_scheduling_ptr->superframe_order);
 		}
 		
 		// No other data is expected
@@ -254,11 +245,20 @@ implementation
 	event error_t NLME_JOIN.indication(uint16_t ShortAddress, uint32_t ExtendedAddress[], uint8_t CapabilityInformation, bool SecureJoin)
 	{
 		printf("NLME_JOIN.indication\r\n", "");
+		printf("ShortAddress : %u \r\n", ShortAddress);
+		printf("ExtendedAddress : %u \r\n", ExtendedAddress);
+		printf("CapabilityInformation : %u \r\n", CapabilityInformation);
+		printf("SecureJoin : %d \r\n", SecureJoin);
+		
 		return SUCCESS;
 	}
 
 	event error_t NLME_JOIN.confirm(uint16_t PANId, uint8_t Status, uint16_t parentAddress)
 	{	
+		printf("NLME_JOIN.confirm\r\n", "");
+		printf("PANId : %zu \r\n", PANId);
+		printf("Status : %u \r\n", Status);
+		printf("parentAddress : %zu \r\n", parentAddress);
 		return SUCCESS;
 	}
 
@@ -288,6 +288,8 @@ implementation
 
 	event error_t NLME_SYNC.confirm(uint8_t Status)
 	{
+		printf("NLME_SYNC.confirm\r\n", "");
+		printf("Status : %u \r\n", Status);
 		return SUCCESS;
 	}
 
@@ -306,10 +308,10 @@ implementation
 	event error_t NLME_RESET.confirm(uint8_t status)
 	{
 		printf("NLME_RESET.confirm\r\n", "");
+		printf("Status : %u \r\n", status);
 		call T_init.startOneShot(5000);
 		return SUCCESS;
 	}
-
 
 	/*******************T_init**************************/
 	event void T_init.fired() 
