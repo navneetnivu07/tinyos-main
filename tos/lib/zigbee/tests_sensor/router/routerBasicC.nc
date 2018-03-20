@@ -171,6 +171,9 @@ implementation
 	event error_t NLME_NETWORK_DISCOVERY.confirm(uint8_t NetworkCount,networkdescriptor networkdescriptorlist[], uint8_t Status)
 	{
 		printf("NLME_NETWORK_DISCOVERY.confirm\r\n", ""); 
+		printf("NetworkCount : %u \r\n", NetworkCount);
+		printf("networkdescriptor : %s \r\n", networkdescriptorlist);
+		printf("Status : %u \r\n", Status);
 		return SUCCESS;
 	}
 
@@ -178,6 +181,7 @@ implementation
 	event error_t NLME_START_ROUTER.confirm(uint8_t Status)
 	{ 
 		printf("NLME_START_ROUTER.confirm\r\n", "");
+		printf("Status %d\r\n", Status);
 		return SUCCESS;
 	}
 
@@ -185,12 +189,19 @@ implementation
 	event error_t NLME_JOIN.indication(uint16_t ShortAddress, uint32_t ExtendedAddress[], uint8_t CapabilityInformation, bool SecureJoin)
 	{
 		printf("NLME_JOIN.indication\r\n", "");
+		printf("ShortAddress : %u \r\n", ShortAddress);
+		printf("ExtendedAddress : %u \r\n", ExtendedAddress);
+		printf("CapabilityInformation : %u \r\n", CapabilityInformation);
+		printf("SecureJoin : %d \r\n", SecureJoin);
 		return SUCCESS;
 	}
 
 	event error_t NLME_JOIN.confirm(uint16_t PANId, uint8_t Status, uint16_t parentAddress)
 	{
 		printf("NLME_JOIN.confirm\r\n", "");
+		printf("PANId : %zu \r\n", PANId);
+		printf("Status : %u \r\n", Status);
+		printf("parentAddress : %zu \r\n", parentAddress);
 		switch(Status)
 		{
 		case NWK_SUCCESS:
@@ -263,6 +274,7 @@ implementation
 	event error_t NLME_SYNC.confirm(uint8_t Status)
 	{
 		printf("NLME_SYNC.confirm\r\n", "");
+		printf("Status : %u \r\n", Status);
 		return SUCCESS;
 	}
 
@@ -283,6 +295,7 @@ implementation
 	event error_t NLME_RESET.confirm(uint8_t status)
 	{
 		printf("NLME_RESET.confirm\r\n", "");
+		printf("Status : %u \r\n", status);
 		call T_init.startOneShot(5000);
 		return SUCCESS;
 	}
@@ -330,4 +343,3 @@ implementation
 #endif
 
 }
-

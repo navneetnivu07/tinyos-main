@@ -76,7 +76,7 @@ implementation
 
 		// Send the message towards the coordinator 
 		// (default network address: 0x0000)
-		printf("nsdu_pay %d\r\n", nsdu_pay);
+		printf("nsdu_pay %s\r\n", nsdu_pay);
 		//  command error_t request(uint16_t DstAddr, uint8_t NsduLength, uint8_t Nsdu[120], uint8_t NsduHandle, uint8_t Radius, uint8_t DiscoverRoute, uint8_t SecurityEnable);
 		call NLDE_DATA.request(0x0000, 7, nsdu_pay, 0, 1, 0x00, 0);
 	}
@@ -108,30 +108,15 @@ implementation
 
 	event void Tempread.readDone(error_t result, uint16_t val){
 		temperature = (-39.60 + 0.01 * val);
-		if (result == SUCCESS){
-			printf("current temperature is: %d \r\n", temperature);
-		}else{
-			printf("Error reading from sensors \r\n");
-		}	
 	}
 
 	event void Lightread.readDone(error_t result, uint16_t val){
 		luminance = 2.5 *((val/4096.0) *6250.0);
-		if (result == SUCCESS){
-			printf("current light is: %d \r\n", luminance);
-		}else{
-			printf("Error reading from sensors \r\n");
-		}
 	}
 
 	event void Humread.readDone(error_t result, uint16_t val){
 		humidity = -4 + 0.0405*val + (-2.8 * pow(10,-6))*pow(val,2);
 		humidity_true = (temperature - 25) * (0.01 + 0.00008*val) + humidity;
-		if (result == SUCCESS){
-			printf("current humidity is: %d \r\n", humidity_true);
-		}else{
-			printf("Error reading from sensors \r\n");
-		}
 	}
 
 
@@ -144,6 +129,8 @@ implementation
 	event error_t NLDE_DATA.confirm(uint8_t NsduHandle, uint8_t Status)
 	{
 		printf("NLDE_DATA.confirm\r\n", "");
+		printf("NsduHandle %d\r\n", NsduHandle);
+		printf("Status : %u \r\n", Status);
 		if (joined != 0x00)
 			call Leds.led1Toggle();
 			
@@ -153,6 +140,10 @@ implementation
 	event error_t NLDE_DATA.indication(uint16_t SrcAddress, uint8_t NsduLength, uint8_t Nsdu[120], uint16_t LinkQuality)
 	{
 		printf("NLDE_DATA.indication\r\n", "");
+		printf("SrcAddress %d\r\n", SrcAddress);
+		printf("NsduLength %d\r\n", NsduLength);
+		printf("Nsdu %s\r\n", Nsdu);
+		printf("LinkQuality %d\r\n", LinkQuality);
 		return SUCCESS;
 	}
 
@@ -165,7 +156,10 @@ implementation
 	// directly to the parent and issuing a JOIN confirm, instead
 	event error_t NLME_NETWORK_DISCOVERY.confirm(uint8_t NetworkCount,networkdescriptor networkdescriptorlist[], uint8_t Status)
 	{
-		printf("NLME_NETWORK_DISCOVERY.confirm\r\n", ""); 
+		printf("NLME_NETWORK_DISCOVERY.confirm\r\n", "");
+		printf("NetworkCount : %u \r\n", NetworkCount);
+		printf("networkdescriptor : %s \r\n", networkdescriptorlist);
+		printf("Status : %u \r\n", Status); 
 		return SUCCESS;
 	}
 
@@ -173,12 +167,19 @@ implementation
 	event error_t NLME_JOIN.indication(uint16_t ShortAddress, uint32_t ExtendedAddress[], uint8_t CapabilityInformation, bool SecureJoin)
 	{
 		printf("NLME_JOIN.indication\r\n", "");
+		printf("ShortAddress : %u \r\n", ShortAddress);
+		printf("ExtendedAddress : %u \r\n", ExtendedAddress);
+		printf("CapabilityInformation : %u \r\n", CapabilityInformation);
+		printf("SecureJoin : %d \r\n", SecureJoin);
 		return SUCCESS;
 	}
 
 	event error_t NLME_JOIN.confirm(uint16_t PANId, uint8_t Status, uint16_t parentAddress)
 	{	
 		printf("NLME_JOIN.confirm\r\n", "");
+		printf("PANId : %zu \r\n", PANId);
+		printf("Status : %u \r\n", Status);
+		printf("parentAddress : %zu \r\n", parentAddress);
 		switch(Status)
 		{
 		case NWK_SUCCESS:
@@ -256,6 +257,7 @@ implementation
 	event error_t NLME_SYNC.confirm(uint8_t Status)
 	{
 		printf("NLME_SYNC.confirm\r\n", "");
+		printf("Status : %u \r\n", Status);
 		return SUCCESS;
 	}
 
@@ -276,6 +278,7 @@ implementation
 	event error_t NLME_RESET.confirm(uint8_t status)
 	{
 		printf("NLME_RESET.confirm\r\n", "");
+		printf("Status : %u \r\n", status);
 		call T_init.startOneShot(2000);
 		return SUCCESS;
 	}
@@ -321,4 +324,3 @@ implementation
 
   
 }
-

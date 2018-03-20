@@ -20,7 +20,7 @@ implementation
 	components MainC;
 	components LedsC;
 	components SerialPrintfC;
-
+	
 	components end_deviceBasicC as App;
 	App.Boot -> MainC;
 	App.Leds -> LedsC;
@@ -32,18 +32,18 @@ implementation
 	components new TimerMilliC() as NetAssociationDeferredTimer;
 	App.NetAssociationDeferredTimer -> NetAssociationDeferredTimer;
 
-#if defined(PLATFORM_TELOSB)
-	//User Button
-	components UserButtonC;
-	App.Get -> UserButtonC;
-	App.Notify -> UserButtonC;
-
 	components new SensirionSht11C() as Tsensor;
 	App.Tempread -> Tsensor.Temperature;
 	App.Humread -> Tsensor.Humidity;
 
 	components new HamamatsuS10871TsrC() as Lsensor;
 	App.Lightread -> Lsensor;
+
+#if defined(PLATFORM_TELOSB)
+	//User Button
+	components UserButtonC;
+	App.Get -> UserButtonC;
+	App.Notify -> UserButtonC;
 #endif
 
 	components NWKC;
@@ -56,5 +56,4 @@ implementation
 	App.NLME_SYNC -> NWKC.NLME_SYNC;
 	App.NLME_GET -> NWKC.NLME_GET;
 	App.NLME_SET -> NWKC.NLME_SET;
-
 }

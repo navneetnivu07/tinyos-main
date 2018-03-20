@@ -4,7 +4,6 @@
  */
 
 #include <Timer.h>
-
 #include "nwk_enumerations.h"
 
 #if defined(PLATFORM_TELOSB)
@@ -13,17 +12,17 @@
 
 #include "nwk_const_coordinator.h"
 
-
 configuration coordinatorBasicAppC {
 }
 implementation
 {
 	components MainC;
-//	components LedsC;
+	//components LedsC;
 	components coordinatorBasicC as App;
+	components SerialPrintfC;
 
 	App.Boot -> MainC;
-//	App.Leds -> LedsC;
+	//App.Leds -> LedsC;
 	
 	components new TimerMilliC() as T_init;
 	App.T_init -> T_init;
@@ -46,9 +45,5 @@ implementation
 	App.NLME_SYNC -> NWKC.NLME_SYNC;
 	App.NLME_GET -> NWKC.NLME_GET;
 	App.NLME_SET -> NWKC.NLME_SET;
-
-	  components SerialPrintfC;
-
-
 }
 

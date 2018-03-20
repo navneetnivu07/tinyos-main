@@ -9,7 +9,7 @@ PFLAGS += 	-I$(ZIGBEE)/../shadow
 PFLAGS += 	-I$(ZIGBEE)/includes	\
 			-I$(ZIGBEE)/interfaces	\
 			-I$(ZIGBEE)/nwk
-
+			
 PFLAGS += -I$(TINYOS_OS_DIR)/lib/printf
 
 PFLAGS += -DIM_ROUTER
