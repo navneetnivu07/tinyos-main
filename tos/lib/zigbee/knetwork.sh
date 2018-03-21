@@ -25,4 +25,4 @@ install_type device_type USB addr depth parent x y
 ./pmote.sh i e 0 10 2 1 120 150
 ./pmote.sh i e 0 11 2 1 173 116
 ./pmote.sh i e 0 12 2 2 150 120
-./pmote.sh i e 0 13 2 2 116 173
+./pmote.sh i e 0 13 2 2 116 180
