@@ -4,7 +4,7 @@
 
 PLATFORM=telosb
 
-APP_TEST_PATH=tests_sensor
+APP_TEST_PATH=tests_post
 echo $APP_TEST_PATH
 
 PROG_DEV=bsl
