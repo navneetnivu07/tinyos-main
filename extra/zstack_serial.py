@@ -8,7 +8,7 @@ ser = serial.Serial(
     stopbits=serial.STOPBITS_ONE,
     bytesize=serial.EIGHTBITS
 )
-
+host = "localhost"
 while 1:
     a = ser.readline()
     ary = a.split(',')
@@ -18,7 +18,7 @@ while 1:
         sense = ary[5]
         print(sense[1:2])
         if(sense[1:2] == 'T'):
-            query = "http://localhost/wsn/ins.php?pc=" + ary[0] + "&sa=" + ary[1] + "&nsln=" + ary[2] + "&lq=" + ary[3] + "&id=" + ary[4] + "&temp=" + ary[5] + "&lux=" + ary[6] + "&hum=" + ary[7] + "&co=" + '--' + "&co2=" + '--'
+            query = "http://" +host+"/wsn/ins.php?pc=" + ary[0] + "&sa=" + ary[1] + "&nsln=" + ary[2] + "&lq=" + ary[3] + "&id=" + ary[4] + "&temp=" + ary[5] + "&lux=" + ary[6] + "&hum=" + ary[7] + "&co=" + '--' + "&co2=" + '--'
             query = query.replace(" ", "")
             query = query.replace("T", "")
             query = query.replace("L", "")
@@ -27,7 +27,7 @@ while 1:
             contents = urllib.urlopen(query).read()
             print(contents)
         elif(sense[1:2] == 'C'):
-            query = "http://localhost/wsn/ins.php?pc=" + ary[0] + "&sa=" + ary[1] + "&nsln=" + ary[2] + "&lq=" + ary[3] + "&id=" + ary[4] + "&temp=" + '--' + "&lux=" + '--' + "&hum=" + '--' + "&co=" + ary[5] + "&co2=" + ary[6]
+            query = "http://" +host+"/wsn/ins.php?pc=" + ary[0] + "&sa=" + ary[1] + "&nsln=" + ary[2] + "&lq=" + ary[3] + "&id=" + ary[4] + "&temp=" + '--' + "&lux=" + '--' + "&hum=" + '--' + "&co=" + ary[5] + "&co2=" + ary[6]
             query = query.replace(" ", "")
             query = query.replace("C", "")
             query = query.replace("O", "")
